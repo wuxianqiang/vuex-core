@@ -1,5 +1,34 @@
 let Vue;
 
+class ModuleCollection {
+  constructor (options) {
+    this.register([], options)
+  }
+  register (path, rawModule) {
+    let newModule = {
+      _raw: rawModule,
+      _children: {},
+      state: rawModule.state
+    }
+    if (path.length === 0) {
+      // 跟模块
+      this.root = newModule
+    } else {
+      // 子模块
+      let parent = path.slice(0, -1).reduce((prev, cur) => {
+        return prev._children[cur]
+      }, this.root)
+      parent._children[path[path.length - 1]] = newModule
+    }
+    if (rawModule.modules) {
+      // 递归
+      forEach(rawModule.modules, (childName, module) => {
+        this.register(path.concat(childName), module)
+      })
+    }
+  }
+}
+
 class Store {
   constructor (options) {
     this.getters = {}
@@ -11,29 +40,9 @@ class Store {
         state
       }
     })
+    // 计算模块之间的依赖关系
+    this.modules = new ModuleCollection(options)
 
-    let getters = options.getters
-    forEach(getters, (getterName, getterFn) => {
-      Object.defineProperty(this.getters, getterName, {
-        get: () => {
-          return getterFn(state)
-        }
-      })
-    })
-
-    let mutations = options.mutations
-    forEach(mutations, (mutationName, mutationFn) => {
-      this.mutations[mutationName] = () => {
-        mutationFn.call(this, state)
-      }
-    })
-
-    let actions = options.actions
-    forEach(actions, (actionName, actionFn) => {
-      this.actions[actionName] = () => {
-        actionFn.call(this, this)
-      }
-    })
     let {commit, dispatch} = this
     this.commit = (type) => {
       commit.call(this, type)

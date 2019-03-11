@@ -2,8 +2,8 @@
   <div class="hello">
     <h1>{{ msg }}</h1>
     <div>
-      {{ $store.state.count }}
-      {{ $store.getters.getCount }}
+      <!-- {{ $store.state.count }} -->
+      <!-- {{ $store.getters.getCount }} -->
     </div>
     <button @click="handleClick">
       +
@@ -22,7 +22,7 @@ export default {
   },
   methods: {
     handleClick () {
-      this.$store.commit('setCount')
+      // this.$store.commit('setCount')
       // this.$store.dispatch('updateCount')
     }
   }

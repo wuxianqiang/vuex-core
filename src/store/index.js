@@ -4,6 +4,20 @@ import Vuex from './vuex'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
+  modules: {
+    a: {
+      state: {
+        a: 1
+      },
+      modules: {
+        b: {
+          state: {
+            b: 2
+          }
+        }
+      }
+    }
+  },
   state: {
     count: 1
   },
